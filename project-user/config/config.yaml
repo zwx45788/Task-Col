@@ -1,0 +1,15 @@
+zap:
+  debugFileName: "D:\\git-demo\\ms-project\\logs\\debug\\project-debug.log"
+  infoFileName: "D:\\git-demo\\ms-project\\logs\\info\\project-info.log"
+  warnFileName: "D:\\git-demo\\ms-project\\logs\\error\\project-error.log"
+  maxSize: 500
+  maxAge: 28
+  maxBackups: 3
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+server:
+  name: "project-user"
+  addr: ":8080"

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"project-user/config"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -16,11 +17,7 @@ type RedisCache struct {
 var Rc *RedisCache
 
 func init() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
+	rdb := redis.NewClient(config.C.InitRedisOptions())
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
