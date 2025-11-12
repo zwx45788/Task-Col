@@ -5,7 +5,7 @@ import (
 	"os"
 	"project-common/logs"
 
-	"github.com/go-redis/redis/v8"
+	//"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 )
 
@@ -22,10 +22,8 @@ type ServerConfig struct {
 	Addr string
 }
 type GrpcConfig struct {
-	Name    string
-	Addr    string
-	Version string
-	Weight  int64
+	Name string
+	Addr string
 }
 type EtcdConfig struct {
 	Addrs []string
@@ -51,9 +49,7 @@ func InitConfig() *Config {
 
 	// 初始化 ServerConfig
 	conf.SC = conf.InitServerConfig()
-	conf.GC = conf.InitGrpcConfig()
 	conf.InitZapLog()
-	conf.InitRedisOptions()
 	conf.ReadEtcdConfig()
 	return conf
 }
@@ -72,23 +68,11 @@ func (c *Config) InitZapLog() {
 		log.Fatalln(err)
 	}
 }
-func (c *Config) InitRedisOptions() *redis.Options {
-	return &redis.Options{
-		Addr:     c.viper.GetString("redis.host") + ":" + c.viper.GetString("redis.port"),
-		Password: c.viper.GetString("redis.password"), // no password set
-		DB:       c.viper.GetInt("db"),                // use default DB
-	}
-}
+
 func (c *Config) InitServerConfig() *ServerConfig {
 	return &ServerConfig{
 		Name: c.viper.GetString("server.name"),
 		Addr: c.viper.GetString("server.addr"),
-	}
-}
-func (c *Config) InitGrpcConfig() *GrpcConfig {
-	return &GrpcConfig{
-		Name: c.viper.GetString("grpc.name"),
-		Addr: c.viper.GetString("grpc.addr"),
 	}
 }
 func (c *Config) ReadEtcdConfig() {

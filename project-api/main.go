@@ -13,11 +13,10 @@ import (
 func main() {
 	r := gin.Default()
 	router.InitRouter(r)
-	gc := router.RegisterGrpc()
-	router.RegisterEtcdServer()
-	stop := func() {
-		gc.Stop()
-	}
-	common.Run(r, config.C.SC.Name, config.C.SC.Addr, stop)
+	// gc := router.RegisterGrpc()
+	// stop := func() {
+	// 	gc.Stop()
+	// }
+	common.Run(r, config.C.SC.Name, config.C.SC.Addr, nil)
 
 }

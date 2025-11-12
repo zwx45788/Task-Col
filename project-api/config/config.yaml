@@ -5,19 +5,9 @@ zap:
   maxSize: 500
   maxAge: 28
   maxBackups: 3
-redis:
-  host: "localhost"
-  port: 6379
-  password: ""
-  db: 0
 server:
-  name: "project-user"
-  addr: ":8080"
-grpc:
-  name: "user"
-  addr: "127.0.0.1:8081"
-  version: "1.0.0"
-  weight: 2
+  name: "project-api"
+  addr: "127.0.0.1:8080"
 etcd:
   addrs:
     - "127.0.0.1:2379"

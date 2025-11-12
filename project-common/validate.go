@@ -2,7 +2,7 @@ package common
 
 import "regexp"
 
-func VerifyMobilde(mobile string) bool {
+func VerifyMobile(mobile string) bool {
 	if mobile == "" {
 		return false
 	}
