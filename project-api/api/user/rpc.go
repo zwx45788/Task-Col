@@ -2,21 +2,22 @@ package user
 
 import (
 	"log"
-	loginServiceV1 "project-user/pkg/service/login.service.v1"
+	login "project-grpc/user/login"
 
+	_ "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var LoginServiceClient loginServiceV1.LoginServiceClient
+var LoginServiceClient login.LoginServiceClient
 
-func InitUserRpc() {
+func InitRpcUserClient() {
 	conn, err := grpc.NewClient("etcd:///user", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	LoginServiceClient = loginServiceV1.NewLoginServiceClient(conn)
-	loginServiceV1.NewLoginServiceClient(conn)
+	LoginServiceClient = login.NewLoginServiceClient(conn)
+
 	//c := pb.NewGreeterClient(conn)
 	//
 	//// Contact the server and print out its response.

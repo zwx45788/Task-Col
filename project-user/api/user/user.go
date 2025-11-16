@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 	common "project-common"
-	"project-user/pkg/dao"
+	"project-user/internal/dao"
+	"project-user/internal/repo"
 	"project-user/pkg/model"
-	"project-user/pkg/repo"
 	"time"
 
 	"project-common/errs"

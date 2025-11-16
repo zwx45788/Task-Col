@@ -3,5 +3,6 @@ go 1.25.1
 use (
 	./project-api
 	./project-common
+	./project-grpc
 	./project-user
 )

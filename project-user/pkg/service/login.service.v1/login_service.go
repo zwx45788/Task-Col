@@ -5,24 +5,28 @@ import (
 	"log"
 	common "project-common"
 	"project-common/errs"
-	"project-user/pkg/dao"
+	login "project-grpc/user/login"
+	"project-user/internal/dao"
+	"project-user/internal/repo"
 	"project-user/pkg/model"
-	"project-user/pkg/repo"
-
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type LoginService struct {
-	UnimplementedLoginServiceServer
-	Cache repo.Cache
+	login.UnimplementedLoginServiceServer
+	Cache      repo.Cache
+	memberRepo repo.MemberRepo
 }
 
 func NewLoginService() *LoginService {
 	return &LoginService{
-		Cache: dao.Rc,
+		Cache:      dao.Rc,
+		memberRepo: dao.NewMemberDao(),
 	}
 }
-func (ls *LoginService) GetCaptcha(ctx context.Context, msg *CaptchaMessage) (*CaptchaResponse, error) {
+func (ls *LoginService) GetCaptcha(ctx context.Context, msg *login.CaptchaMessage) (*login.CaptchaResponse, error) {
 
 	//1.获取参数
 	mobile := msg.Mobile
@@ -38,7 +42,7 @@ func (ls *LoginService) GetCaptcha(ctx context.Context, msg *CaptchaMessage) (*C
 		time.Sleep(2 * time.Second)
 		log.Println("短信平台调用成功,发送短信")
 		//5.存储验证码redis到中,过期时间15min
-		err := ls.Cache.Put("REGISTER_"+mobile, code, 15*time.Minute)
+		err := ls.Cache.Put(model.RedisKeyRegisterCaptcha+mobile, code, 15*time.Minute)
 		if err != nil {
 			log.Println("验证码发生错误,cause by:", err)
 		}
@@ -47,5 +51,38 @@ func (ls *LoginService) GetCaptcha(ctx context.Context, msg *CaptchaMessage) (*C
 	}()
 
 	//ctx.JSON(http.StatusOK, rsp.Success("123456"))
-	return &CaptchaResponse{}, nil
+	return &login.CaptchaResponse{}, nil
+}
+func (ls *LoginService) Register(ctx context.Context, msg *login.RegisterMessage) (*login.RegisterResponse, error) {
+	c := context.Background()
+	//1.校验参数
+	//2.校验验证码
+	redisCode, err := ls.Cache.Get(model.RedisKeyRegisterCaptcha + msg.Mobile)
+	if err != nil {
+		zap.L().Error("获取验证码失败", zap.Error(err))
+		return nil, errs.GrpcError(model.RedisError)
+	}
+	if redisCode != msg.Captcha {
+		return nil, errs.GrpcError(model.CaptchaError)
+	}
+	//3.校验业务逻辑
+	exist, err := ls.memberRepo.GetMemberByEmail(c, msg.Email)
+	if err != nil {
+		zap.L().Error("数据库错误", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	if exist {
+		return nil, errs.GrpcError(model.EmailExist)
+	}
+	exist, err = ls.memberRepo.GetMemberByMobile(c, msg.Mobile)
+	if err != nil {
+		zap.L().Error("数据库错误", zap.Error(err))
+		return nil, errs.GrpcError(model.DBError)
+	}
+	if exist {
+		return nil, errs.GrpcError(model.MobileExist)
+	}
+	//4.入库
+	//5.返回响应
+	return &login.RegisterResponse{}, nil
 }

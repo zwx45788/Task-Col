@@ -16,6 +16,7 @@ type Config struct {
 	SC    *ServerConfig
 	GC    *GrpcConfig
 	EC    *EtcdConfig
+	MC    *MysqlConfig
 }
 type ServerConfig struct {
 	Name string
@@ -29,6 +30,13 @@ type GrpcConfig struct {
 }
 type EtcdConfig struct {
 	Addrs []string
+}
+type MysqlConfig struct {
+	Username string
+	Password string
+	Host     string
+	Port     int
+	Db       string
 }
 
 func InitConfig() *Config {
@@ -55,6 +63,7 @@ func InitConfig() *Config {
 	conf.InitZapLog()
 	conf.InitRedisOptions()
 	conf.ReadEtcdConfig()
+
 	return conf
 }
 func (c *Config) InitZapLog() {
@@ -101,4 +110,14 @@ func (c *Config) ReadEtcdConfig() {
 	}
 	ec.Addrs = addrs
 	c.EC = ec
+}
+func (c *Config) InitMysqlConfig() *MysqlConfig {
+	return &MysqlConfig{
+		Username: c.viper.GetString("mysql.username"),
+		Password: c.viper.GetString("mysql.password"),
+		Host:     c.viper.GetString("mysql.host"),
+		Port:     c.viper.GetInt("mysql.port"),
+		Db:       c.viper.GetString("mysql.db"),
+	}
+
 }

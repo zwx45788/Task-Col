@@ -17,6 +17,8 @@ type RouterUser struct {
 }
 
 func (*RouterUser) Route(r *gin.Engine) {
+	InitRpcUserClient()
 	h := &HandlerUser{}
 	r.POST("/project/login/getCaptcha", h.GetCaptcha)
+	r.POST("/project/login/register", h.Register)
 }

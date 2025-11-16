@@ -5,8 +5,9 @@ import (
 	"net"
 	"project-common/discovery"
 	"project-common/logs"
+	login "project-grpc/user/login"
 	"project-user/config"
-	"project-user/pkg/dao"
+	"project-user/internal/dao"
 	loginServiceV1 "project-user/pkg/service/login.service.v1"
 
 	"github.com/gin-gonic/gin"
@@ -53,7 +54,7 @@ func RegisterGrpc() *grpc.Server {
 	c := gRPCConfig{
 		Addr: config.C.GC.Addr,
 		RegisterFunc: func(g *grpc.Server) {
-			loginServiceV1.RegisterLoginServiceServer(g, &loginServiceV1.LoginService{
+			login.RegisterLoginServiceServer(g, &loginServiceV1.LoginService{
 				Cache: dao.Rc,
 			})
 		}}
